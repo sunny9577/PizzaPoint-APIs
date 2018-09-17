@@ -1,1 +1,1 @@
-# PizzaPoint-Admin-Panel-APIs
+# PizzaPoint-APIs
