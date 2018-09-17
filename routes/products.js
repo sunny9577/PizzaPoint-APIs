@@ -1,43 +1,62 @@
-var express = require('express');
-var route = express.Router();
-var database = require('../db.js');
+const express = require('express');
+const route = express.Router();
+const database = require('../db');
 
-route.get('/all',(req, res) => {
-    sql = 'SELECT * FROM `ALL_PRODUCTS_VIEW`';
-    database.query(sql,function(err,result){
-        if(err){
-            console.log(err);
-            result = "error";
-        }
-        res.status(200).json(result);
-    });
-});
+//product
+route.get('/:pid', function(req, res, next) {
 
-route.get('/new',(req, res) => {
-    sql = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'products' AND table_schema = DATABASE( );SELECT cat_name FROM categories ORDER BY priority ";
-    database.query(sql,[2,1],function(err,result){
-        if(err){
-            console.log(err);
-            result = "error";
-            res.status(200).json(result);
-        }else{
+    var sql = "SELECT *  FROM products WHERE product_id = " + req.params.pid + "";
+    database.query(sql, function(err, result) {
+
+        if (result == null || err)
             res.status(200).json({
-                id:result[0][0].AUTO_INCREMENT,
-                category:result[1]
+                status: "failed",
+                message: "Error occured",
+                data: null
+            });
+
+        if (result.length > 0) {
+            res.status(200).json({
+                status: "ok",
+                message: "",
+                data: result
+            });
+        } else {
+            res.status(200).json({
+                status: "failed",
+                message: "No product found",
+                data: null
             });
         }
-        
     });
 });
 
-route.post('/create',(req, res) => {
-    sql = "INSERT INTO products (product_title, product_des, product_image, category, veg, resturant_location, contact, price, currency, home_delivery, pickup) VALUES ('"+req.body.title+"', '"+req.body.desc+"', '"+req.body.uri+"', '"+req.body.category+"' ,'"+req.body.veg+"', '"+req.body.location+"', '"+req.body.contact+"', '"+req.body.price+"', '"+req.body.currency+"', '"+req.body.home_del+"', '"+req.body.pickup+"');";
-    database.query(sql,function(err,result){
-        if(err){
-        console.log(err);
-        result = "error";
+//products
+route.get('/', function(req, res, next) {
+
+    var sql = "SELECT *  FROM products WHERE available = 0";
+    database.query(sql, function(err, result) {
+
+        if (result == null || err)
+            res.status(200).json({
+                status: "failed",
+                message: "Error occured",
+                data: null
+            });
+
+        if (result.length > 0) {
+            res.status(200).json({
+                status: "ok",
+                message: "",
+                data: result
+            });
+        } else {
+            res.status(200).json({
+                status: "failed",
+                message: "No product found",
+                data: null
+            });
         }
-        res.status(200).json(result);
     });
 });
 
